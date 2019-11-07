@@ -1,0 +1,10 @@
+# Oscar A. Carrera
+# 09/28/2019
+---
+- name: Disabling swap
+  command: swapoff -a
+  when: swap_status == "off"
+  
+- name: Enabling swap
+  command: swapon -a
+  when: swap_status == "on"

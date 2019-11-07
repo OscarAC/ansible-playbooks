@@ -1,0 +1,25 @@
+# Oscar A. Carrera
+# 09/28/2019
+---
+- name: Initialize the Kubernetes cluster using kubeadm
+  command: kubeadm init --apiserver-advertise-address="{{ ansible_default_ipv4.address }}" --apiserver-cert-extra-sans="{{ ansible_default_ipv4.address }}"  --node-name {{ansible_hostname}} --pod-network-cidr=192.168.0.0/24 --ignore-preflight-errors=all
+  become: true
+
+- name: Setup kubeconfig for user
+  command: "{{ item }}"
+  with_items:
+  - mkdir -p ~/.kube
+  - cp -i /etc/kubernetes/admin.conf ~/.kube/config
+  - chown "{{ ansible_user }}" ~/.kube/config
+  become: yes
+
+- name: Install calico pod network
+  become: false 
+  command: kubectl apply -f https://docs.projectcalico.org/master/manifests/calico.yaml
+
+- name: Generate join command
+  command: kubeadm token create --print-join-command
+  register: join_command
+
+- name: Copy join command to local file
+  local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join-command"

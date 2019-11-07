@@ -1,0 +1,20 @@
+# Oscar A. Carrera
+# 09/28/2019
+---
+- name: Include architecture
+  include_vars: "{{ ansible_os_family | lower }}.yml"
+  
+- name: Install ntp packages
+  package:
+    name: ntp
+    state: present
+
+- name: Start ntp, if not running
+  service:
+    name: "{{ ntp_service }}"
+    state: started
+  become: yes    
+
+- name: Set the time zone
+  timezone:
+    name: "{{ ntp_timezone }}"

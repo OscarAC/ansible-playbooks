@@ -1,0 +1,18 @@
+# Oscar A. Carrera
+# 09/28/2019
+---
+- name: Remove previous docker installation
+  package:
+    name: docker
+    state: absent
+  become: true
+
+- name: Install docker packages
+  package:
+    name:
+    - net-tools    
+    - apt-transport-https
+    - ca-certificates
+    - docker.io
+    state: present
+  become: true

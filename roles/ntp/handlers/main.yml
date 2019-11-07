@@ -1,0 +1,7 @@
+# Oscar A. Carrera
+# 09/28/2019
+---
+- name: Restart ntp
+  service:
+    name: ntpd
+    state: restarted  

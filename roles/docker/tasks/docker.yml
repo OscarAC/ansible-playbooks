@@ -1,0 +1,19 @@
+# Oscar A. Carrera
+# 09/28/2019
+---
+- include_tasks: docker_debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Add user to docker group
+  user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  with_items: "{{ ansible_user_id }}"
+  become: true
+
+- name: Ensure docker is started
+  service:
+    name: docker
+    state: started
+  become: true

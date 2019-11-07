@@ -1,0 +1,5 @@
+# Oscar A. Carrera
+# 09/28/2019
+---
+- include_tasks: ntp.yml
+  when: with_ntp | bool  

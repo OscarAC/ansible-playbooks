@@ -1,0 +1,47 @@
+# Oscar A. Carrera
+# 09/28/2019
+---
+- name: Add an apt signing key for Kubernetes
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+  become: true
+
+- name: Adding apt repository for Kubernetes
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: kubernetes.list
+  become: true
+
+- name: Install Kubernetes binaries
+  apt: 
+    name: "{{packages}}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+    - kubelet
+    - kubeadm
+    - kubectl
+    - jq
+  become: true
+
+- name: Configure node ip
+  lineinfile:
+    path: /etc/default/kubelet
+    line: KUBELET_EXTRA_ARGS=--node-ip={{ ansible_default_ipv4.address }}
+  become: true
+
+- name: Restart kubelet
+  service:
+    name: kubelet
+    daemon_reload: yes
+    state: restarted
+  become: true
+
+- include_tasks: master.yml
+  when: is_k8_master | bool
+
+- include_tasks: worker.yml
+  when: is_k8_worker | bool

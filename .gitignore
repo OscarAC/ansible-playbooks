@@ -1,0 +1,6 @@
+tmp/
+notes
+site.retry
+master.retry
+node.retry
+join-command

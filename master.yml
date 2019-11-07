@@ -1,0 +1,17 @@
+# Oscar A. Carrera
+# 09/28/2019
+---
+- hosts: master
+  roles:
+    - docker
+    - ntp
+    - swap
+    - kubernetes
+  vars:
+    - with_ntp: true
+    - with_swap: true
+    - swap_status: "off"
+    - with_docker: true
+    - with_kubernetes: true
+    - is_k8_master: true
+    - is_k8_worker: false
