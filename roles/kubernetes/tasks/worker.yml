@@ -1,3 +1,7 @@
 # Oscar A. Carrera
 # 09/28/2019
 ---
+- name: Join Kubernetes Master
+  shell: >
+    {{ kubernetes_join_command }}
+  become: yes

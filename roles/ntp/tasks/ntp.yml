@@ -8,6 +8,7 @@
   package:
     name: ntp
     state: present
+  become: yes    
 
 - name: Start ntp, if not running
   service:
@@ -18,3 +19,4 @@
 - name: Set the time zone
   timezone:
     name: "{{ ntp_timezone }}"
+  become: yes

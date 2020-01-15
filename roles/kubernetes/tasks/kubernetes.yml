@@ -27,10 +27,22 @@
     - jq
   become: true
 
+- name: Set kubelet as a service
+  service:
+    name: kubelet
+    state: started
+    enabled: true
+
+- name: Check if kubelet file exists
+  stat:
+    path: '/etc/default/kubelet'
+  register: kubelet_config
+
 - name: Configure node ip
   lineinfile:
     path: /etc/default/kubelet
-    line: KUBELET_EXTRA_ARGS=--node-ip={{ ansible_default_ipv4.address }}
+    line: KUBELET_EXTRA_ARGS=--node-ip={{ ansible_default_ipv4.address }}  
+  when: kubelet_config.stat.exists
   become: true
 
 - name: Restart kubelet
@@ -43,5 +55,25 @@
 - include_tasks: master.yml
   when: is_k8_master | bool
 
+- name: Generate Kubernetes Master join command.
+  command: kubeadm token create --print-join-command
+  changed_when: false
+  when: is_k8_master | bool
+  register: kubernetes_join_command_result
+  become: true
+
+- name: Register the Kubernetes Master join command.
+  set_fact:
+    kubernetes_join_command: >
+      {{ kubernetes_join_command_result.stdout }}      
+  when: kubernetes_join_command_result.stdout is defined
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  with_items: "{{ groups['all'] }}"
+
 - include_tasks: worker.yml
   when: is_k8_worker | bool
+
+# - name: Copy join command to local file
+#   local_action: copy content="{{ kubernetes_join_command.stdout }}" dest="./join-command"
+#   when: is_k8_master | bool

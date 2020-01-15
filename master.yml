@@ -1,7 +1,7 @@
 # Oscar A. Carrera
 # 09/28/2019
 ---
-- hosts: master
+- hosts: masters
   roles:
     - docker
     - ntp

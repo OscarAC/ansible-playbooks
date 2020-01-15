@@ -4,7 +4,9 @@
 - name: Disabling swap
   command: swapoff -a
   when: swap_status == "off"
+  become: true
   
 - name: Enabling swap
   command: swapon -a
   when: swap_status == "on"
+  become: true

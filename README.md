@@ -3,7 +3,7 @@
 # ansible-playbooks
 
 
-Personal Ansible Stuff (<i><small>Work in progress</small></i>).
+Personal Ansible Playbooks (<i><small>Work in progress</small></i>).
 
 Playbooks included:
 
@@ -31,7 +31,13 @@ staging.yml:
 ```yaml
 [all]
 master ansible_host=192.168.0.10 ansible_user=YOUR_USER ansible_python_interpreter=/usr/bin/python3
+node ansible_host:192.168.0.11 ansible_user=YOUR_USER ansible_python_interpreter=/usr/bin/python3
 ```
+
+the master host should be the first in the list, worker nodes should proceed.
+
+
+<br />
 
 master.yml
 ```yaml
@@ -51,17 +57,30 @@ master.yml
   - is_k8_worker: false
 ```
 
-#### Example environment configuration:
 
-``` ansible-playbook -i staging node.yml -K ```
+node.yml
+```yaml
+- hosts: master
+  roles:
+  - docker
+  - ntp
+  - swap
+  - kubernetes
+  vars:
+  - with_ntp: true
+  - with_swap: true
+  - swap_status: "off"
+  - with_docker: true
+  - with_kubernetes: true
+  - is_k8_master: false
+  - is_k8_worker: true
+```
+
+#### Execute the paybook with
+
+``` ansible-playbook -i staging site.yml -K ```
 
 <i><small>** -K indicates to ask for sudo password</small></i>
 
 
-## Other commands
-
-### Gather all Facts about a node and stored in a directory called ./tmp
-
-``ansible -i staging all -m setup --tree ./tmp/ -K``
-
-
+Executing the playbook will create a master node with <b>pod scheduling enabled</b> this is not recommended for security reasons.
